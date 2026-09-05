@@ -18,7 +18,9 @@ jobs:
     name: PHP ${{ matrix.php }}
 
     steps:
-      - uses: actions/checkout@v4
+      # v4 pins Node 20, which GitHub Actions runners now force onto Node 24 with
+      # a deprecation warning on every run. v5 targets Node 24 directly.
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
