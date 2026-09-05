@@ -1,0 +1,10 @@
+# Normalise to LF in the repository regardless of the machine that commits.
+# Without this, a Windows checkout stores CRLF and every Linux contributor's
+# first PR is a whole-file diff.
+* text=auto eol=lf
+
+# Not shipped to Composer consumers.
+/.github    export-ignore
+/tests      export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
