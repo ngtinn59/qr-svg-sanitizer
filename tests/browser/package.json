@@ -1,0 +1,12 @@
+{
+  "name": "qr-svg-sanitizer-browser-tests",
+  "private": true,
+  "description": "Cross-engine verification of the solidus-in-tag parse behaviour the README relies on. Dev-only; the library itself stays dependency-free.",
+  "scripts": {
+    "test": "playwright test",
+    "install-browsers": "playwright install --with-deps chromium firefox webkit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}

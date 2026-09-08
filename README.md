@@ -44,8 +44,9 @@ none, and executes anyway:
 `/` is a legal attribute separator to an HTML tokeniser. The HTML Standard
 specifies the recovery: emit an `unexpected-solidus-in-tag` parse error, then
 reconsume in the *before attribute name* state — so `onload` is read as an
-attribute and fires. Verified executing in Chromium; the behaviour is
-specified, not a browser quirk. The filter above reports the input clean.
+attribute and fires. Verified executing in all three engine families — Chromium
+153, Firefox 155 and WebKit 26.6 — so this is specified behaviour rather than a
+single browser's quirk. The filter above reports the input clean.
 
 You can keep patching the regex, but you are now maintaining a list of every
 attribute that might ever execute something, against a parser whose job is to
@@ -54,7 +55,8 @@ elements and twenty-two attributes a QR code actually consists of. Anything
 else and the whole blob is rejected — not stripped, rejected.
 
 The test suite asserts the bypass on both sides: that the naive blocklist misses
-it, and that `sanitize()` catches it.
+it, and that `sanitize()` catches it. The claim about the browser is checked
+separately, against the engines themselves — see [Tests](#tests).
 
 ### Problem 2: no `viewBox` means CSS crops instead of scaling
 
@@ -166,6 +168,29 @@ php tests/run.php
 
 No PHPUnit. This library gets dropped into legacy codebases — often a WordPress
 install with no Composer at all — so the tests run on a bare PHP binary.
+
+### Browser engines
+
+The argument for an allowlist rests on a claim about how browsers tokenise
+`<svg/onload=…>`. That is an assertion about three separate implementations, so
+it is checked against them rather than inferred from the specification:
+
+```
+cd tests/browser
+npm install
+npx playwright install --with-deps chromium firefox webkit
+npx playwright test
+```
+
+Five assertions per engine: the handler executes, the tokeniser exposes
+`onload` as an attribute, the node is a real SVG root in the SVG namespace, the
+whitespace-separated form fires in the same engine (so a pass cannot mean the
+engine simply ignores `svg` `onload`), and the naive blocklist reports the
+payload clean. Green on Chromium 153, Firefox 155 and WebKit 26.6, and re-run
+by CI on every push.
+
+Node is needed for that job only. The library itself has no dependencies and
+`php tests/run.php` never touches it.
 
 ---
 
